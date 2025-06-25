@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+  <main class='main'>
+        
+      <div class="card h-100 p-0 radius-12" style="height:100%">
+          <div class="card-body p-24">
+              <div class="row justify-content-center">
+                  <div class="col-xxl-15 col-xl-110 col-lg-50" style="height:100%">
+                      <div class="card border">
+                          <div class="card-body">
+                              {% if messages %}
+                                  {% for message in messages %}
+                                      <div class="alert alert-success">
+                                          {{ message }}
+                                      </div>
+                                  {% endfor %}
+                              {% endif %}
+                              
+
+                              
+                          <form method="POST" action="{% url 'index' %}">
+                            {% csrf_token %}
+                            <div class="modal-body" style="text-align: left;">
+                                <div class="row" style="margin-top: 10px;">
+                                    <!-- Ensure these fields match those in your view -->
+                                    <div class="col">
+                                        <label class="form-label">Team Leader Name</label>
+                                        <input type="text" id="form-team-lead" class="form-control radius-8" placeholder="Team Leader Name" style="width: 100%;" maxlength="20" required name="team_leader_name">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Associate Name</label>
+                                        <input type="text" id="form-associate-name" class="form-control radius-8" placeholder="Associate Name" style="width: 100%;" maxlength="20" required name="associate_name">
+                                    </div>
+                                    
+                                    {% comment %} <div class="col">
+                                        <label class="form-label">Team Leader Name</label>
+                                        <input type="text" class="form-control radius-8" placeholder="Team Leader Name" style="width: 100%;" maxlength="20" required name="team_leader_name">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Associate Name</label>
+                                        <input type="text" class="form-control radius-8" placeholder="Associate Name" style="width: 100%;" maxlength="20" required name="associate_name">
+                                    </div> {% endcomment %}
+                                    <div class="col">
+                                        <label class="form-label">Project Name</label>
+                                        <select class="form-control radius-8" id="project" name="project" required>
+                                            <option value="">Select Project</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.id }}">{{ project.project_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="col">
+                                        <label class="form-label">Plot No</label>
+                                        <input type="text" class="form-control radius-8" id="plot" name="plot" placeholder="plot" style="width: 100%;" required  maxlength="20" required name="plot">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Plot Size</label>
+                                        <input type="text" class="form-control radius-8" id="plot_size" name="plot_size" placeholder="plot_size" style="width: 100%;" required  maxlength="20" required name="plot_size">
+                                    </div>
+
+                                    <!-- <div id="plot-container">
+                                        <div class="plot-entry">
+                                            <div class="col">
+                                                <label class="form-label">Plot No</label>
+                                                <input type="text" class="form-control radius-8" id="plot" name="plot" placeholder="plot" style="width: 100%;" required maxlength="20">
+                                            </div>
+                                            <div class="col">
+                                                <label class="form-label">Plot Size</label>
+                                                <input type="text" class="form-control radius-8" id="plot_size" name="plot_size" placeholder="plot_size" style="width: 100%;" required maxlength="20">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="add-plot" class="btn btn-primary">Add Plot</button> -->
+
+
+                                  </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                    <div class="col">
+                                        <label class="form-label">Client Name</label>
+                                        <input type="text" class="form-control radius-8" placeholder="client_name" style="width: 100%;" maxlength="20" required name="client_name">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Mobile</label>
+                                        <input type="tel" class="form-control radius-8" placeholder="Mobile" style="width: 100%;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" pattern="[0-9]{10}" required name="mobile">
+                                    </div>
+                                
+                                    <div class="col">
+                                        <label class="form-label">Total Price</label>
+                                        <input type="number" class="form-control radius-8" name="total_price" placeholder="Total Price" style="width: 100%;" oninput="calculateValues()" required>
+                                    </div>
+                                    <div class="col">
+                                      <label class="form-label">Discount</label>
+                                      <input type="number" class="form-control radius-8" name="discount" placeholder="Discount" style="width: 100%;" oninput="calculateValues()" required>
+                                  </div>
+                                   <div class="col">
+                                        <label class="form-label">Agreement Values</label>
+                                        <input type="text" class="form-control radius-8" name="agreement_values" placeholder="Agreement Values" style="width: 100%;" readonly>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top: 10px;">
+                                     
+                                    <div class="col">
+                                        <label class="form-label">Deal Values</label>
+                                        <input type="text" class="form-control radius-8" name="deal_value" placeholder="Deal Values" style="width: 100%;" oninput="calculateValues()" readonly>
+                                    </div>
+                                    <div class="col">
+                                      <label class="form-label">Payment Method</label>
+                                      <select class="form-control radius-8" id="payment_method" name="payment_method" onchange="togglePaymentFields()">
+                                          <option value="">Select Method</option>
+                                          <option value="cash">Cash</option>
+                                          <option value="cheque">Cheque</option>
+                                          <option value="bank_upi">Bank UPI</option>
+                                      </select>
+                                  </div>
+                                  <div class="col" id="cash_amount_field" style="display:none;">
+                                      <label class="form-label">Cash Amount</label>
+                                      <input type="text" class="form-control radius-8" name="cash_amount" placeholder="Cash Amount" style="width: 100%;" oninput="calculateValues()">
+                                  </div>
+                                  <div class="col" id="cheque_fields" style="display:none;">
+                                      <div class="row">
+                                          <div class="col">
+                                              <label class="form-label">Cheq_No</label>
+                                              <input type="text" class="form-control radius-8" id="cheque_no" name="cheque_no" placeholder="Cheque No" style="width: 100%;" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);">
+                                          </div>
+                                          <div class="col">
+                                              <label class="form-label">Cheq_Amount</label>
+                                              <input type="text" class="form-control radius-8" name="cheque_amount" placeholder="Cheque Amount" style="width: 100%;" oninput="calculateValues()">
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col" id="re_amount_field" style="display:none;">
+                                      <label class="form-label">Submit Amount</label>
+                                      <input type="text" class="form-control radius-8" name="re_amount" placeholder="Re Amount" style="width: 100%;" oninput="calculateValues()">
+                                  </div>
+                                  
+                                    <div class="col">
+                                        <label class="form-label">Received Amount</label>
+                                        <input type="text" class="form-control radius-8" name="sum_amount" placeholder="Sum Amount" style="width: 100%;" readonly>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Remaining Amount</label>
+                                        <input type="text" class="form-control radius-8" name="remaining_amount" placeholder="Remaining Amount" style="width: 100%;" readonly>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="d-flex align-items-center justify-content-center gap-3">
+                                        <input type="submit" id="add_record" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8">
+                                    </div>
+                                </div>
+                            </div>
+                          </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+  
+    <div class="container-fluid"> 
+      <div class="dashboard-main-body">
+            <div class="d-flex align-items-center mb-24" style="gap: 10px;">
+              <h6 class="fw-semibold mb-0">Customers</h6>
+              <form class="d-flex" onsubmit="searchTable2(); return false;">
+                <input class="form-control me-2" id="searchInput2" name="search2" type="search" onkeyup="searchTable2()" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            <form id="exportForm" method="POST" action="{% url 'export_users' %}">
+                {% csrf_token %}
+                <button type="button" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-8"  onclick="submitExportForm()">Export to CSV</button>
+            </form>
+            </div>
+          <div class="card h-100 p-0 radius-12">
+              
+              <div class="card-body p-24">
+                  <div class="table-responsive scroll-sm">
+                      {% if messages %}
+                      {% for message in messages %}
+                      <div class="alert alert-success">
+                          {{ message }}
+                      </div>
+                      {% endfor %}
+                      {% endif %}
+                      {% comment %} <form id="exportForm" method="POST" action="{% url 'export_users' %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-outline-primary" onclick="submitExportForm()">Download Selected</button>
+                    </form> {% endcomment %}
+                    
+                      <table class="table table-bordered table-striped" id="myTable">
+                          <thead>
+                              <tr>
+                                  {% comment %} <th>SR. NO</th> {% endcomment %}
+                                  {% comment %} <th>Select</th> {% endcomment %}
+                                  <th><input type="checkbox" id="select-all"></th>
+                                  <th>Team_Leader</th>
+                                  <th>Associate</th>
+                                  <th>Project</th>
+                                  <th>Plot_no</th>
+                                  {% comment %} <th>Plot_size</th> {% endcomment %}
+                                  <th>Client</th>
+                                  <th>Mobile</th>
+                                  <th>Total_Pri</th>
+                                  <th>Discount</th>
+                                  <th>Agree_Value</th>
+                                  {% comment %} <th>Cash Amount</th>
+                                  <th>Cheque Amount</th>
+                                  <th>Cheque No</th> {% endcomment %}
+                                  <th>Received</th>
+                                  <th>Remaining</th>
+                                  <th>Booking</th>
+                                  {% comment %} <th>Updated Date</th> {% endcomment %}
+                                  <th>Details</th>
+                                  <th>Pay_details</th>
+
+
+                                </tr>
+                          </thead>
+                          <tbody id="myTable">
+                              {% for user in users %}
+                              <tr id="user-{{user.id}}">
+                                <td><input type="checkbox" class="select-checkbox" name="selected_ids" value="{{ user.id }}"></td>
+                                {% comment %} <td><input type="checkbox" class="select-checkbox" name="selected_ids" value="{{ user.id }}"></td> {% endcomment %}
+                                {% comment %} <td><input type="checkbox" class="select-checkbox"></td> {% endcomment %}
+                                  {% comment %} <td>{{ forloop.counter }}</td> {% endcomment %}
+                                  <td class="team_leader_name userData" name="team_leader_name">{{ user.team_leader_name }}</td>
+                                  <td class="associate_name userData" name="associate_name">{{ user.associate_name }}</td>
+                                  <td class="project_name userData" name="project_name">{{ user.project.project_name }}</td>
+                                  <td class="plot userData" name="plot">{{ user.plot }}</td>
+                                  {% comment %} <td class="plot userData" name="plot_size">{{ user.plot_size }}</td> {% endcomment %}
+
+                                  <td class="client_name userData" name="client_name">{{ user.client_name }}</td>
+                                  <td class="mobile userData" name="mobile">{{ user.mobile }}</td>
+                                  <td class="total_price userData" name="total_price">{{ user.total_price }}</td>
+                                  <td class="discount userData" name="discount">{{ user.discount }}</td>
+                                  <td class="agreement_values userData" name="agreement_values">{{ user.agreement_values }}</td>
+                                  {% comment %} <td>{{ user.cash_amount }}</td>
+                                  <td class="cheque_amount userData" name="cheque_amount">{{ user.cheque_amount }}</td>
+                                  <td class="cheque_no userData" name="cheque_no">{{ user.cheque_no }}</td> {% endcomment %}
+                                  <td class="sum_amount userData" name="sum_amount">{{ user.sum_amount }}</td>
+                                  <td class="remaining_amount userData" name="remaining_amount">{{ user.remaining_amount }}</td>
+                                  <td>{{ user.created_date|date:"Y-m-d"}}</td>
+                                <td>
+                                    <button type="button" id="editButton"  class="btn btn-primary" data-bs-toggle="modal" 
+                                    data-bs-target="#exampleModal" onClick="editUser({{user.id}})">
+                                    Details
+                                      </button>
+                                </td>
+                                <td>
+                                    <a href="{% url 'payment_details' user.id %}">
+                                        <button type="button" class="btn btn-primary">
+                                            Payment
+                                        </button>
+                                    </a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                     
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Record</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="modal-body" style="text-align: left;">
+                        <div class="row" style="margin-top: 10px;">
+                            <input class="form-control" id="form-id" type="hidden" name="formId"/>
+                            <div class="col">
+                                <label class="form-label">Team Leader Name</label>
+                                <input type="text" id="form-team-lead" class="form-control radius-8" placeholder="Team Leader Name" style="width: 100%;" maxlength="200" required name="team_leader_name" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Associate Name</label>
+                                <input type="text" id="form-associate-name" class="form-control radius-8" placeholder="Associate Name" style="width: 100%;" maxlength="200" required name="associate_name" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" id="form-project" class="form-control radius-8" placeholder="Project Name" style="width: 100%;" maxlength="200" required name="project" readonly>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col">
+                                <label class="form-label">Plot No</label>
+                                <input type="text" class="form-control radius-8" id="form-plot" name="plot" placeholder="Plot" style="width: 100%;" required maxlength="200" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Client Name</label>
+                                <input type="text" id="form-client" class="form-control radius-8" placeholder="Client Name" style="width: 100%;" maxlength="200" required name="client_name" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Mobile</label>
+                                <input type="text" id="form-mobile" class="form-control radius-8" placeholder="Mobile" style="width: 100%;" maxlength="13" required name="mobile" readonly>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col">
+                                <label class="form-label">Total Price</label>
+                                <input type="number" id="form-total-price" class="form-control radius-8" name="total_price" placeholder="Total Price" style="width: 100%;" required readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Discount%</label>
+                                <input type="text" id="form-discount" class="form-control radius-8" name="discount" placeholder="Discount" style="width: 100%;" required readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Agreement Values</label>
+                                <input type="text" id="agreement-values" class="form-control radius-8" name="agreement_values" placeholder="Agreement Values" style="width: 100%;" readonly>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-4">
+                                <label class="form-label">Deal Value</label>
+                                <input type="text" id="form-deal-value" class="form-control radius-8" name="deal_value" placeholder="Deal Value" style="width: 100%;" readonly>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">Received Amount</label>
+                                <input type="text" id="form-received-amount" class="form-control radius-8" name="sum_amount" placeholder="Sum Amount" style="width: 100%;" readonly>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">Remaining Amount</label>
+                                <input type="text" id="form-remaining-amount" class="form-control radius-8" name="remaining_amount" placeholder="Remaining Amount" style="width: 100%;" readonly>
+                            </div>
+                        </div>
+                        <div class="border" style="margin-top: 15px; margin-bottom: 15px;"></div>
+                            <div class="col" id="cheque_fields">
+                                <div class="row">
+                                <div class="col" id="cash_amount_field">
+                                    <label class="form-label">Cash Amount</label>
+                                    <input type="number" id="form-cash-amount" class="form-control radius-8" name="cash_amount" placeholder="Cash Amount" style="width: 100%;">
+                                    <input type="number" id="form-cash-amount1" class="form-control radius-8" name="cash_amount" placeholder="Cash Amount" style="width: 100%;" hidden>
+                                </div>
+                                
+                                    <div class="col">
+                                        <label class="form-label">Cheque No</label>
+                                        <input type="text" class="form-control radius-8" id="form-cheque_no" name="cheque_no" placeholder="Cheque No" style="width: 100%;" maxlength="6">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Cheque Amount</label>
+                                        <input type="number" id="form-cheque-amount" class="form-control radius-8" name="cheque_amount" placeholder="Cheque Amount" style="width: 100%;">
+                                        <input type="number" id="form-cheque-amount1" class="form-control radius-8" name="cheque_amount" placeholder="Cheque Amount" style="width: 100%;" hidden>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                <input type="submit" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-6">
+                                <button type="button" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-6" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+  <!-- -------------------------- -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    document.getElementById('add-plot').addEventListener('click', function() {
+        var container = document.getElementById('plot-container');
+        var newPlotEntry = document.createElement('div');
+        newPlotEntry.classList.add('plot-entry');
+        newPlotEntry.innerHTML = `
+            <div class="col">
+                <label class="form-label">Plot No</label>
+                <input type="text" class="form-control radius-8" name="plot" placeholder="plot" style="width: 100%;" required maxlength="20">
+            </div>
+            <div class="col">
+                <label class="form-label">Plot Size</label>
+                <input type="text" class="form-control radius-8" name="plot_size" placeholder="plot_size" style="width: 100%;" required maxlength="20">
+            </div>
+        `;
+        container.appendChild(newPlotEntry);
+    });
+</script>
+    
+<script>
+
+function editUser(id) {
+    $.ajax({
+        url: `/edit-record/${id}/`,
+        type: 'GET',
+        success: function(data) {
+            $('#form-id').val(data.id);
+            $('#form-team-lead').val(data.team_leader_name);
+            $('#form-associate-name').val(data.associate_name);
+            $('#form-project').val(data.project);
+            $('#form-plot').val(data.plot);
+            $('#form-client').val(data.client_name);
+            $('#form-mobile').val(data.mobile);
+            $('#form-total-price').val(data.total_price);
+            $('#form-discount').val(data.discount);
+            $('#agreement-values').val(data.agreement_values);
+            $('#form-received-amount').val(data.sum_amount);
+            $('#form-remaining-amount').val(data.remaining_amount);
+            $('#form-deal-value').val(data.deal_value);
+
+            // $('#form-cash-amount').val(0);
+            // $('#form-cheque-amount').val(0);
+            $('#exampleModal').modal('show');
+        }
+    });
+}
+
+$('#exampleModal form').on('submit', function(e) {
+    e.preventDefault();
+    const data = {
+        id: $('#form-id').val(),
+        team_leader_name: $('#form-team-lead').val(),
+        associate_name: $('#form-associate-name').val(),
+        project: $('#form-project').val(),
+        plot: $('#form-plot').val(),
+        client_name: $('#form-client').val(),
+        mobile: $('#form-mobile').val(),
+        total_price: $('#form-total-price').val(),
+        discount: $('#form-discount').val(),
+        agreement_values: $('#agreement-values').val(),
+        cash_amount: $('#form-cash-amount').val(),
+        cheque_no: $('#form-cheque_no').val(),
+        cheque_amount: $('#form-cheque-amount').val(),
+        sum_amount: $('#form-received-amount').val(),
+        remaining_amount: $('#form-remaining-amount').val(),
+    };
+
+    $.ajax({
+        url: `/update-record/`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.status === "200") {
+                $('#exampleModal').modal('hide');
+                alert(response.message)
+                location.reload(); // Refresh the page to reflect changes
+            }else{
+                alert(response.message)
+            }
+            // $('#exampleModal').modal('hide');
+            // alert(response.message)
+            // location.reload(); // Refresh the page to reflect changes
+        },
+        error: function(response) {
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
+</script>
+
+
+<script>
+  function calculateValues() {
+      const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      const cashAmount = parseFloat(document.getElementById('cash_amount').value) || 0;
+      const chequeAmount = parseFloat(document.getElementById('cheque_amount').value) || 0;
+    //   const dealValue = parseFloat(document.getElementById('deal_value').value) || 0;
+    //   console.log(totalPrice, dealValue, 'AAAAAAAAAAAAAAAAAAAAA');
+      
+      const agreementValues = Math.round(totalPrice - discount);
+      const sumAmount = Math.round(cashAmount + chequeAmount);
+      const remainingAmount = Math.round(agreementValues - sumAmount);
+
+      document.getElementById('agreement_values').value = agreementValues;
+      document.getElementById('sum_amount').value = sumAmount;
+      document.getElementById('remaining_amount').value = remainingAmount;
+      
+  }
+
+  // Attach event listeners to inputs
+  document.getElementById('total_price').addEventListener('input', calculateValues);
+  document.getElementById('discount').addEventListener('input', calculateValues);
+  document.getElementById('cash_amount').addEventListener('input', calculateValues);
+  document.getElementById('cheque_amount').addEventListener('input', calculateValues);
+
+  // Initial calculation to set the values on page load
+  document.addEventListener('DOMContentLoaded', calculateValues);
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  function populateUserDetails(element) {
+      // Set form values using the data attributes from the button
+      document.getElementById('team_leader_name').value = element.getAttribute('data-team-leader-name');
+      document.getElementById('associate_name').value = element.getAttribute('data-associate-name');
+      document.getElementById('project').value = element.getAttribute('data-project-name');
+      document.getElementById('plot').value = element.getAttribute('data-plot');
+      document.getElementById('client_name').value = element.getAttribute('data-client-name');
+      document.getElementById('mobile').value = element.getAttribute('data-mobile');
+      document.getElementById('total_price').value = element.getAttribute('data-total-price');
+      document.getElementById('discount').value = element.getAttribute('data-discount');
+      document.getElementById('agreement_values').value = element.getAttribute('data-agreement_values');
+      document.getElementById('cash_amount').value = element.getAttribute('data-cash_amount');
+      document.getElementById('cheque_amount').value = element.getAttribute('data-cheque_amount');
+      document.getElementById('cheque_no').value = element.getAttribute('data-cheque_no');
+      document.getElementById('sum_amount').value = element.getAttribute('data-sum-amount');
+      document.getElementById('remaining_amount').value = element.getAttribute('data-remaining-amount');
+  }
+  </script>
+
+<script>
+  function togglePaymentFields() {
+      var paymentMethod = document.getElementById('payment_method').value;
+      var cashAmountField = document.getElementById('cash_amount_field');
+      var chequeFields = document.getElementById('cheque_fields');
+      var reAmountField = document.getElementById('re_amount_field');
+      var chequeAmountInput = document.querySelector('input[name="cheque_amount"]'); // Get the Cheque Amount input
+      var reAmountInput = document.querySelector('input[name="re_amount"]'); // Get the Re Amount input
+  
+      // Hide all fields initially
+      cashAmountField.style.display = 'none';
+      chequeFields.style.display = 'none';
+      reAmountField.style.display = 'none';
+      
+      // Show fields based on the selected payment method
+      if (paymentMethod === 'cash') {
+          cashAmountField.style.display = 'block';
+      } else if (paymentMethod === 'cheque') {
+          chequeFields.style.display = 'block'; // Show both cheque fields when Cheque is selected
+      } else if (paymentMethod === 'bank_upi') {
+          reAmountInput.value = chequeAmountInput.value; // Copy value from Cheque Amount to Re Amount
+          reAmountField.style.display = 'block'; // Show Re Amount field for Bank UPI
+      }
+  }
+  </script>
+  
+
+  <script>
+    function calculateValues() {
+      const totalPrice = parseFloat(document.querySelector('input[name="total_price"]').value) || 0;
+      const discount = parseFloat(document.querySelector('input[name="discount"]').value) || 0;
+      const cashAmount = parseFloat(document.querySelector('input[name="cash_amount"]').value) || 0;
+      const chequeAmount = parseFloat(document.querySelector('input[name="cheque_amount"]').value) || 0;
+      const dealValue = parseFloat(document.querySelector('input[name="deal_value"]').value) || 0;
+  
+      // Calculate agreement values
+      const agreementValues = Math.round(totalPrice - discount - cashAmount);
+      // Calculate sum amount
+      const sumAmount = Math.round(cashAmount + chequeAmount);
+      // Calculate remaining amount
+      const remainingAmount = Math.round(agreementValues - sumAmount + cashAmount);
+      const finaldealValue = cashAmount
+  
+      // Update fields with calculated values
+      document.querySelector('input[name="agreement_values"]').value = agreementValues;
+      document.querySelector('input[name="sum_amount"]').value = sumAmount;
+      document.querySelector('input[name="remaining_amount"]').value = remainingAmount;
+      document.querySelector('input[name="deal_value"]').value = finaldealValue;
+    }
+  
+    // Attach event listeners to inputs
+    document.querySelector('input[name="total_price"]').addEventListener('input', calculateValues);
+    document.querySelector('input[name="discount"]').addEventListener('input', calculateValues);
+    document.querySelector('input[name="cash_amount"]').addEventListener('input', calculateValues);
+    document.querySelector('input[name="cheque_amount"]').addEventListener('input', calculateValues);
+  </script>
+
+<script>
+    document.getElementById("select-all").addEventListener("change", function() {
+        var checkboxes = document.getElementsByClassName("select-checkbox");
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = this.checked;
+        }
+    });
+
+    function searchTable2() {
+        var input, filter, table, tr, td, i, j, txtValue;
+        input = document.getElementById("searchInput2");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) { // start at 1 to skip the header row
+            tr[i].style.display = "none"; // hide the row initially
+            td = tr[i].getElementsByTagName("td");
+            
+            for (j = 0; j < td.length; j++) { // iterate over all columns
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = ""; // show the row if a match is found
+                        break; // break the inner loop if a match is found
+                    }
+                }
+            }
+        }
+    }
+
+    function submitExportForm() {
+        var form = document.getElementById("exportForm");
+        var checkboxes = document.getElementsByClassName("select-checkbox");
+        var selectedIds = [];
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked && checkboxes[i].closest('tr').style.display !== 'none') {
+                selectedIds.push(checkboxes[i].value);
+            }
+        }
+
+        if (selectedIds.length > 0) {
+            for (var i = 0; i < selectedIds.length; i++) {
+                var hiddenField = document.createElement("input");
+                hiddenField.type = "hidden";
+                hiddenField.name = "selected_ids";
+                hiddenField.value = selectedIds[i];
+                form.appendChild(hiddenField);
+            }
+        }
+        
+        form.submit();
+    }
+</script> 
+
+
+<script>
+document.getElementById('form-associate-name').addEventListener('input', function() {
+    var associateName = this.value;
+    if (associateName.length > 0) {
+        fetch(`/get-team-leader-name/?associate_name=${associateName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.team_leader_name) {
+                    document.getElementById('form-team-lead').value = data.team_leader_name;
+                } else {
+                    document.getElementById('form-team-lead').value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('form-team-lead').value = '';
+            });
+    } else {
+        document.getElementById('form-team-lead').value = '';
+    }
+});
+</script>
+
+
+
+
+  {% endblock %}
+  

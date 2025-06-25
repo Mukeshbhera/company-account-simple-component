@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+  <main class='main'>
+        
+    <div class="container-fluid"> <!-- Ensure full-width container -->
+        <div class="dashboard-main-body">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+                <h6 class="fw-semibold mb-0">Customers Users</h6>
+                <ul class="d-flex align-items-center gap-2">
+                    <li class="fw-medium"></li>
+                </ul>
+            </div>
+    
+            
+            <div class="card h-100 p-0 radius-12">
+                <div
+                    class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        {% comment %} <form class="navbar-search">
+                            <input type="text" id="searchInput" class="bg-base h-40-px w-auto" name="search"
+                                placeholder="Search" onkeyup="searchTable()">
+                            <iconify-icon icon="ion:search-outline" class="icon"></iconify-icon>
+                        </form> {% endcomment %}
+                    </div>
+                    {% comment %} <a href="{% url 'index' %}"
+                        class="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
+                        <iconify-icon icon="ic:baseline-plus" class="icon text-xl line-height-1"></iconify-icon>
+                        New Customers Created
+                    </a> {% endcomment %}
+                </div>
+                <div class="card-body p-24">
+                    <div class="table-responsive scroll-sm">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        <table class="table bordered-table sm-table mb-0" id="myTable">
+                            <thead>
+                                <tr>
+                                    <th>SR. NO</th>
+                                    <th>Team Leader Name</th>
+                                    <th>Associate Name</th>
+                                    <th>Project Name</th>
+                                    <th>Plot No</th>
+                                    <th>Client Name</th>
+                                    <th>Mobile No</th>
+                                    <th>Total Price</th>
+                                    <th>Discount</th>
+                                    <th>Agreement Values</th>
+                                   
+                                    <th>Sum Amount</th>
+                                    <th>Remaining Amount</th>
+                                    <th>Booking Date</th>
+                                    <th>Details</th>
+                                   
+                                    <th>Edit</th>
+  
+  
+                                  </tr>
+                            </thead>
+                            <tbody id="myTable">
+                                {% for user in users %}
+                                <tr id="user-{{user.id}}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td class="team_leader_name userData" name="team_leader_name">{{ user.team_leader_name }}</td>
+                                    <td class="associate_name userData" name="associate_name">{{ user.associate_name }}</td>
+                                    <td class="project_name userData" name="project_name">{{ user.project.project_name }}</td>
+                                    <td class="plot userData" name="plot">{{ user.plot }}</td>
+                                    <td class="client_name userData" name="client_name">{{ user.client_name }}</td>
+                                    <td class="mobile userData" name="mobile">{{ user.mobile }}</td>
+                                    <td class="total_price userData" name="total_price">{{ user.total_price }}</td>
+                                    <td class="discount userData" name="discount">{{ user.discount }}</td>
+                                    <td class="agreement_values userData" name="agreement_values">{{ user.agreement_values }}</td>
+                                    <td class="cheque_amount userData" name="cheque_amount">{{ user.cheque_amount }}</td>
+                                    <td class="cheque_no userData" name="cheque_no">{{ user.cheque_no }}</td>
+                                    <td class="sum_amount userData" name="sum_amount">{{ user.sum_amount }}</td>
+                                    <td class="remaining_amount userData" name="remaining_amount">{{ user.remaining_amount }}</td>
+                                    <td>{{ user.created_date }}</td>
+  
+                                    
+                                  <td>
+                                      <button type="button" id="editButton"  class="btn btn-primary" data-bs-toggle="modal" 
+                                      data-bs-target="#exampleModal" onClick="editUser({{user.id}})">
+                                          Edit
+                                        </button>
+                                  </td>
+                                  
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- my modal for edit -->
+
+  <button type="button" id="editButton"  class="btn btn-primary" data-bs-toggle="modal" 
+  data-bs-target="#exampleModal" onClick="editUser({{user.id}})">
+      Edit
+    </button>
+  
+  <!-- Modal -->
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Record</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="modal-body" style="text-align: left;">
+                        <div class="row" style="margin-top: 10px;">
+                            <input class="form-control" id="form-id" type="hidden" name="formId"/>
+                            <div class="col">
+                                <label class="form-label">Team Leader Name</label>
+                                <input type="text" id="form-team-lead" class="form-control radius-8" placeholder="Team Leader Name" style="width: 100%;" maxlength="200" required name="team_leader_name">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Associate Name</label>
+                                <input type="text" id="form-associate-name" class="form-control radius-8" placeholder="Associate Name" style="width: 100%;" maxlength="200" required name="associate_name">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" id="form-project" class="form-control radius-8" placeholder="Project Name" style="width: 100%;" maxlength="200" required name="project">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Plot No</label>
+                                <input type="text" class="form-control radius-8" id="form-plot" name="plot" placeholder="Plot" style="width: 100%;" required maxlength="200">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col">
+                                <label class="form-label">Client Name</label>
+                                <input type="text" id="form-client" class="form-control radius-8" placeholder="Client Name" style="width: 100%;" maxlength="200" required name="client_name">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Mobile</label>
+                                <input type="text" id="form-mobile" class="form-control radius-8" placeholder="Mobile" style="width: 100%;" maxlength="13" required name="mobile">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Total Price</label>
+                                <input type="number" id="form-total-price" class="form-control radius-8" name="total_price" placeholder="Total Price" style="width: 100%;" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Discount%</label>
+                                <input type="text" id="form-discount" class="form-control radius-8" name="discount" placeholder="Discount" style="width: 100%;" required>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col">
+                                <label class="form-label">Agreement Values</label>
+                                <input type="text" id="agreement-values" class="form-control radius-8" name="agreement_values" placeholder="Agreement Values" style="width: 100%;" readonly>
+                            </div>
+                            <div class="col" id="cash_amount_field">
+                                <label class="form-label">Cash Amount</label>
+                                <input type="number" id="form-cash-amount" class="form-control radius-8" name="cash_amount" placeholder="Cash Amount" style="width: 100%;">
+                                <input type="number" id="form-cash-amount1" class="form-control radius-8" name="cash_amount" placeholder="Cash Amount" style="width: 100%;" hidden>
+                            </div>
+                            <div class="col" id="cheque_fields">
+                                <div class="row">
+                                    <div class="col">
+                                        <label class="form-label">Cheque No</label>
+                                        <input type="text" class="form-control radius-8" id="form-cheque_no" name="cheque_no" placeholder="Cheque No" style="width: 100%;" maxlength="6">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Cheque Amount</label>
+                                        <input type="number" id="form-cheque-amount" class="form-control radius-8" name="cheque_amount" placeholder="Cheque Amount" style="width: 100%;">
+                                        <input type="number" id="form-cheque-amount1" class="form-control radius-8" name="cheque_amount" placeholder="Cheque Amount" style="width: 100%;" hidden>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Received Amount</label>
+                                <input type="text" id="form-received-amount" class="form-control radius-8" name="sum_amount" placeholder="Sum Amount" style="width: 100%;" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Remaining Amount</label>
+                                <input type="text" id="form-remaining-amount" class="form-control radius-8" name="remaining_amount" placeholder="Remaining Amount" style="width: 100%;" readonly>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                <input type="submit" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-6">
+                                <button type="button" class="btn btn-primary border border-primary-600 text-md px-56 py-12 radius-6" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Existing HTML content -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function editUser(id) {
+    $.ajax({
+        url: `/edit-record/${id}/`,
+        type: 'GET',
+        success: function(data) {
+            $('#form-id').val(data.id);
+            $('#form-team-lead').val(data.team_leader_name);
+            $('#form-associate-name').val(data.associate_name);
+            $('#form-project').val(data.project);
+            $('#form-plot').val(data.plot);
+            $('#form-client').val(data.client_name);
+            $('#form-mobile').val(data.mobile);
+            $('#form-total-price').val(data.total_price);
+            $('#form-discount').val(data.discount);
+            $('#agreement-values').val(data.agreement_values);
+            $('#form-received-amount').val(data.sum_amount);
+            $('#form-remaining-amount').val(data.remaining_amount);
+
+            $('#form-cash-amount').val(0);
+            $('#form-cheque-amount').val(0);
+            $('#exampleModal').modal('show');
+        }
+    });
+}
+
+function calculateAmounts() {
+    const totalPrice = parseFloat($('#form-remaining-amount').val()) || 0;
+    const existingSumAmount = parseFloat($('#form-received-amount').val()) || 0;
+
+    const newCashAmount = parseFloat($('#form-cash-amount').val()) || 0;
+    const newChequeAmount = parseFloat($('#form-cheque-amount').val()) || 0;
+
+    const newSumAmount = existingSumAmount + newCashAmount + newChequeAmount;
+    const newReceivedAmount = newCashAmount + newChequeAmount;
+    const newRemainingAmount = totalPrice - newReceivedAmount;
+
+    $('#form-received-amount').val(newSumAmount.toFixed(2));
+    $('#form-remaining-amount').val(newRemainingAmount.toFixed(2));
+}
+
+function calculateAmountsyy() {
+    const totalPrice = parseFloat($('#form-remaining-amount').val()) || 0;
+    const existingSumAmount = parseFloat($('#form-received-amount').val()) || 0;
+
+    const totalPrice1 = parseFloat($('#form-cash-amount').val()) || 0;
+    console.log(totalPrice1, 'AAAAAAAAAAAAAAAAAAAA');
+
+    const newCashAmount = parseFloat($('#form-cash-amount').val()) || 0;
+    const newChequeAmount = parseFloat($('#form-cheque-amount').val()) || 0;
+
+    const newSumAmount = existingSumAmount + newCashAmount + newChequeAmount;
+    const newReceivedAmount = newCashAmount + newChequeAmount;
+    const newRemainingAmount = totalPrice - newReceivedAmount;
+
+    $('#form-received-amount').val(newSumAmount.toFixed(2));
+    $('#form-remaining-amount').val(newRemainingAmount.toFixed(2));
+}
+
+$('#form-cash-amount').on('change', function() {
+    calculateAmounts();
+});
+
+$('#form-cheque-amount').on('change', function() {
+    calculateAmountsyy();
+});
+
+$('#exampleModal form').on('submit', function(e) {
+    e.preventDefault();
+    const data = {
+        id: $('#form-id').val(),
+        team_leader_name: $('#form-team-lead').val(),
+        associate_name: $('#form-associate-name').val(),
+        project: $('#form-project').val(),
+        plot: $('#form-plot').val(),
+        client_name: $('#form-client').val(),
+        mobile: $('#form-mobile').val(),
+        total_price: $('#form-total-price').val(),
+        discount: $('#form-discount').val(),
+        agreement_values: $('#agreement-values').val(),
+        cash_amount: $('#form-cash-amount').val(),
+        cheque_no: $('#form-cheque_no').val(),
+        cheque_amount: $('#form-cheque-amount').val(),
+        sum_amount: $('#form-received-amount').val(),
+        remaining_amount: $('#form-remaining-amount').val(),
+    };
+
+    $.ajax({
+        url: `/update-record/`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            $('#exampleModal').modal('hide');
+            location.reload(); // Refresh the page to reflect changes
+        },
+        error: function(response) {
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
+</script>
+
+
+
+{% endblock %}
+
+
+
+  <!-- -------------------------- -->
+

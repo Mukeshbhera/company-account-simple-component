@@ -1,0 +1,48 @@
+{% extends 'company/base.html' %}
+{% block content %}
+{% load static %}
+
+<hr>
+<div class="container">
+    <h3 class="text-center">Payment Details</h3>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">S.N.</th>
+                <th scope="col">Team Leader Name</th>
+                <th scope="col">Project Name</th>
+                <th scope="col">Total Price</th>
+                <th scope="col">Agreement Values</th>
+                <th scope="col">Cheque number</th>
+                <th scope="col">check amount</th>
+                <th scope="col">Case Amount</th>
+                <th scope="col">Received Amount</th>
+                <th scope="col">Remaining Amount</th>
+                <th scope="col">Created Date</th>
+                <!-- <th scope="col">Project Name</th>
+                <th scope="col">Total Price</th> -->
+            </tr>
+            </thead>
+            {% for pay in payment %}
+            <tbody>
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ pay.records.team_leader_name }}</td>
+                <td>{{ pay.records.project.project_name }}</td>
+                <td>{{ pay.records.total_price }}</td>
+                <td>{{ pay.records.agreement_values }}</td>
+                <td>{{ pay.cheque_number }}</td>
+                <td>{{ pay.cheque_amount }}</td>
+                <td>{{ pay.case_amount }}</td>
+                <td>{{ pay.received_amount }}</td>
+                <td>{{ pay.remaining_amount }}</td>
+                <td>{{ pay.created_date }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
